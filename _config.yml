@@ -86,7 +86,7 @@ deploy:
 backup:
     type: git
     repository:
-       coding: https://git.coding.net/niu203/hengblog.git,hexo
+       coding: https://github.com/niu203/niu203.github.io.git,hexo
 # $ npm install hexo-generator-search --save
 search:
   path: search.xml
