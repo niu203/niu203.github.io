@@ -33,7 +33,7 @@ scheme: Paradox
 
 # UI & UX: slogan, color, effect
 uiux:
-    slogan: "Hi, nice to meet you"
+    slogan: "<h3>你怎么来了?！<h3><h5> &nbsp;&nbsp;&nbsp;&nbsp;学习，记录，分享<h5>"
     theme_color: "#0097A7"
     theme_sub_color: "#00838F"
     hyperlink_color: "#00838F"
@@ -157,36 +157,36 @@ toc:
 
 # SNS Menu
 sns:
-    email: youremail@email.com
-    facebook: "https://www.facebook.com/facebook"
-    twitter: "https://twitter.com/twitter"
+    email: 203niu@gmail.com
+    facebook:
+    twitter: 
     googleplus: "https://www.google.com/"
     weibo:
     instagram:
     tumblr:
-    github:
+    github: "https://www.github.com/"
     linkedin:
     zhihu:
-    bilibili:
+    bilibili:  "https://www.bilibili.com/"
     telegram:
     v2ex:
 
 # SNS Share Switch
 sns_share:
-    twitter: true
-    facebook: true
-    googleplus: true
+    twitter: false
+    facebook: false
+    googleplus: false
     weibo: true
     linkedin: false
-    qq: false
+    qq: true
     telegram: false
 
 # Sidebar Customize
 sidebar:
     dropdown:
-        Email Me:
-            link: "#"
-            icon: email
+        关于我:
+            link: "/about"
+            icon: person
     homepage:
         use: true
         icon: home
@@ -194,22 +194,30 @@ sidebar:
     archives:
         use: true
         icon: inbox
-        divider: false
+        divider: true
     categories:
-        use: false
+        use: true
         icon: chrome_reader_mode
         divider: false
     pages:
+        标签云:
+            link: "/tags"
+            icon: cloudy
+            divider: false
+        时间轴:
+            link: "/timeline"
+            icon: timeline
+            divider: false
         #About:
             #link: "/about"
             #icon: person
             #divider: false
     article_num:
-        use: false
+        use: true
         divider: false
     footer:
-        divider: true
-        theme: true
+        divider: false
+        theme: false
         support: false
         feedback: false
         material: false
@@ -225,7 +233,7 @@ sidebar:
 # If you want to use gitment or gitalk,you should get the client_id and client_secret form https://github.com/settings/applications/new
 # If you want to use valine,you should get the app_id and app_key form https://leancloud.cn ,more setting please see https://valine.js.org
 comment:
-    use: 
+    use: valine
     shortname: # duoshuo or disqus shortname
     changyan_appid:
     changyan_conf:
@@ -235,14 +243,14 @@ comment:
     gitment_owner:  # git repo's owner
     gitment_client_id:  # github app client id 
     gitment_client_secret :  # github app client secret 
-    valine_leancloud_appId:  # leancloud application app id
-    valine_leancloud_appKey:  # leancloud application app key
+    valine_leancloud_appId: R7P9Kx0jNSqegT0XQPfGcdsK-gzGzoHsz
+    valine_leancloud_appKey: 6i36HkOhRmgvcFSkewS7iJs1
     valine_notify: false # valine mail notify (true/false) https://github.com/xCss/Valine/wiki
     valine_verify: false # valine verify code (true/false)
     valine_pageSize: 10 # comment list page size
     valine_avatar: identicon # gravatar style https://valine.js.org/#/avatar
     valine_lang: zh-cn # i18n
-    valine_placeholder: Just go go # valine comment input placeholder(like: Please leave your footprints )
+    valine_placeholder: 我要留言 # valine comment input placeholder(like: Please leave your footprints )
     valine_guest_info: nick,mail,link #valine comment header info
     gitalk_repo: # git repo of the hexo
     gitalk_owner: # git repo's owner
@@ -253,7 +261,7 @@ comment:
 # Available value:
 #     swiftype | google | local
 search:
-    use: google
+    use: local
     swiftype_key:
 
 # Analytics Systems
