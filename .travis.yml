@@ -24,7 +24,7 @@ after_script:
 
 branches:
   only:
-    - hero
+    - hexo
 env:
- global:
+  global:
    - GH_REF: github.com/niu203/niu203.github.io.git
