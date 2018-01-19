@@ -268,7 +268,7 @@ search:
 # Available value:
 #     baidu | google | cnzz
 analytics:
-    google_site_id:
+    google_site_id: UA-112751053-1
     baidu_site_id:
     cnzz_site_id:
 
