@@ -266,9 +266,10 @@ search:
 
 # Analytics Systems
 # Available value:
+#  "UA-112751053-1" google
 #     baidu | google | cnzz
 analytics:
-    google_site_id: "UA-112751053-1"
+    google_site_id:
     baidu_site_id:
     cnzz_site_id:
 
