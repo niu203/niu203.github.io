@@ -20,7 +20,7 @@ after_script:
   - git add .
   - git commit -m "Update docs"
   - git push --force --quiet "https://${gh_token}@${GH_REF}" master:master
-  - git push --force --quiet "https://${code_t}@${GH_REF}" master:master
+  - git push --force --quiet "https://${code_t}@${GH_REE}" master:master
 # E: Build LifeCycle
 
 branches:
