@@ -70,11 +70,11 @@ background:
 
 # Images Settings
 img:
-    logo: "https://niu203.coding.me/hengblog/img/logo.png"
-    avatar: "https://niu203.coding.me/hengblog/img/avatar.png"
-    daily_pic: "https://niu203.coding.me/hengblog/img/daily_pic.png"
-    sidebar_header: "https://niu203.coding.me/hengblog/img/sidebar_header.png"
-    random_thumbnail: "https://niu203.coding.me/hengblog/img/random/material-"
+    logo: "https://bg.heng.ga/img/logo.png"
+    avatar: "https://bg.heng.ga/img/avatar.png"
+    daily_pic: "https://bg.heng.ga/img/daily_pic.png"
+    sidebar_header: "https://bg.heng.ga/img/sidebar_header.png"
+    random_thumbnail: "https://bg.heng.ga/img/random/material-"
     footer_image:
         #upyun_logo:
             #link: "https://www.upyun.com/"
