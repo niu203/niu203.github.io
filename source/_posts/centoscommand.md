@@ -64,7 +64,7 @@ tags: [Linux,命令]
 ### 组件安装
 
 　##### telent
-　>windows系统可在`组件`中安装
+　> windows系统可在`组件`中安装
 
 　　检测是否存在
      
@@ -75,7 +75,7 @@ tags: [Linux,命令]
 　　    $ yum -y install telnet
 
 　##### wget
-　>wget是一个下载文件的工具，用来从指定的URL下载文件。
+　> wget是一个下载文件的工具，用来从指定的URL下载文件。
      
 　　安装
 
@@ -85,7 +85,7 @@ tags: [Linux,命令]
 　　    $ wget url
 
 　##### mosh
-　　>[Mosh](https://mosh.org/)是一个移动Shell，可用于SSH连接（远程登陆），具有响应快、支持间歇性连接等优点，使用时需要在服务器端与客户端上分别安装。
+　　> [Mosh](https://mosh.org/)是一个移动Shell，可用于SSH连接（远程登陆），具有响应快、支持间歇性连接等优点，使用时需要在服务器端与客户端上分别安装。
 
 　　安装
 
