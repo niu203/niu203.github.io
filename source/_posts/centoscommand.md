@@ -20,8 +20,8 @@ tags: [Linux,命令]
 - 查看端口 `netstat –apn | grep 8080`
 
 ### tar压缩命令
-- 查看端口 `netstat –apn | grep 8080`
 
+* 主选项
     `c` 创建一个新的Tar文件，即压缩文件。
         $ tar cf filename.tar file1 file2 ...
         $ tar cf filename.tar ./*  
@@ -35,7 +35,6 @@ tags: [Linux,命令]
  > 注意: c、x、t 仅能同时使用一个。
  
 - 辅助选项
-
     `f` filename，后面紧跟文档名，通常必有此参数。
     
     `z` 是否需要用 gzip 压缩或解压， 一般格式为`xx.tar.gz`或`xx. tgz`。
@@ -62,7 +61,7 @@ tags: [Linux,命令]
     
 ### 组件安装
 
-- **telent**
+<li>**telent**</li>
     >windows系统可在`组件`中安装
 
     检测是否存在
