@@ -20,7 +20,7 @@ tags: [Linux,命令]
 - 查看端口 `netstat –apn | grep 8080`
 
 ### tar压缩命令
-- 主选项
+- 查看端口 `netstat –apn | grep 8080`
 
     `c` 创建一个新的Tar文件，即压缩文件。
         $ tar cf filename.tar file1 file2 ...
