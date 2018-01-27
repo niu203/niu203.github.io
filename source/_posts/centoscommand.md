@@ -21,11 +21,11 @@ tags: [Linux,命令]
 
 ### tar压缩命令
 
-　### 主选项
+#### 　主选项
 
 　　`c` 创建一个新的Tar文件，即压缩文件。
 　　    $ tar cf filename.tar file1 file2 ...
-　　    $ tar cf filename.tar ./*  
+　　    $ tar cf filename.tar ./*  
 
 　　`x` 从Tar文件中释放文件，即解压文件。
 　　    $ tar xf filename.tar 
@@ -33,9 +33,9 @@ tags: [Linux,命令]
 　　`t` 列出Tar文件的内容。
 　　    $ tar tf filename.tar
 
- > 注意: c、x、t 仅能同时使用一个。
+> 注意: c、x、t 仅能同时使用一个。
  
-　### 辅助选项
+#### 　辅助选项
     
 　　`f` filename，后面紧跟文档名，通常必有此参数。
     
@@ -48,8 +48,8 @@ tags: [Linux,命令]
 　　`v` 压缩过程中显示文件信息（常用） 
     
 　　`--exclude FILE`：在压缩的过程中， 排除`FILE`文件
-    
-　### 总结
+    
+#### 　总结
 
 　　打包 `$ tar cvf f.tar f`
     
@@ -63,36 +63,36 @@ tags: [Linux,命令]
     
 ## 组件安装
 
-　### telent
-　> windows系统可在`组件`中安装
+#### 　telent
+> windows系统可在`组件`中安装
 
 　　检测是否存在
      
-　　    $ rpm -qa| grep telnet
+        $ rpm -qa| grep telnet
       
 　　安装
 
-　　    $ yum -y install telnet
+        $ yum -y install telnet
 
-　#### wget
-　> wget是一个下载文件的工具，用来从指定的URL下载文件。
+#### 　wget
+> wget是一个下载文件的工具，用来从指定的URL下载文件。
      
 　　安装
 
-　　    $ yum -y install wget
+        $ yum -y install wget
 　　使用
 
-　　    $ wget url
+        $ wget url
 
-　#### mosh
-　　> [Mosh](https://mosh.org/)是一个移动Shell，可用于SSH连接（远程登陆），具有响应快、支持间歇性连接等优点，使用时需要在服务器端与客户端上分别安装。
+#### 　mosh
+> [Mosh](https://mosh.org/)是一个移动Shell，可用于SSH连接（远程登陆），具有响应快、支持间歇性连接等优点，使用时需要在服务器端与客户端上分别安装。
 
 　　安装
 
-　　    $ yum -y install epel-release
-　　    $ yum makecache
-　　    $ yum -y install mosh
+        $ yum -y install epel-release
+        $ yum makecache
+        $ yum -y install mosh
       
 　　启动
 
-　　    $ mosh-server
+        $ mosh-server
