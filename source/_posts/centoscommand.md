@@ -21,7 +21,7 @@ tags: [Linux,命令]
 
 ### tar压缩命令
 
-　#### 主选项
+　### 主选项
 
 　　`c` 创建一个新的Tar文件，即压缩文件。
 　　    $ tar cf filename.tar file1 file2 ...
@@ -35,7 +35,7 @@ tags: [Linux,命令]
 
  > 注意: c、x、t 仅能同时使用一个。
  
-　#### 辅助选项
+　### 辅助选项
     
 　　`f` filename，后面紧跟文档名，通常必有此参数。
     
@@ -49,7 +49,7 @@ tags: [Linux,命令]
     
 　　`--exclude FILE`：在压缩的过程中， 排除`FILE`文件
     
-　#### 总结
+　### 总结
 
 　　打包 `$ tar cvf f.tar f`
     
@@ -61,9 +61,9 @@ tags: [Linux,命令]
     
 　　查看 `$ tar tf f.tar`
     
-### 组件安装
+## 组件安装
 
-　#### telent
+　### telent
 　> windows系统可在`组件`中安装
 
 　　检测是否存在
