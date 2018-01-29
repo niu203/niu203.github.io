@@ -40,8 +40,8 @@ tags: [Linux,命令]
 　　`f` filename，后面紧跟文档名，通常必有此参数。
     
 　　`z` 是否需要用 gzip 压缩或解压， 一般格式为`xx.tar.gz`或`xx. tgz`。
-　　    $ tar czf test.tar.gz a b 压缩
-　　    $ tar xzf test.tar.gz a b 解压
+        $ tar czf test.tar.gz a b 压缩
+        $ tar xzf test.tar.gz a b 解压
 
 　　`j` 是否需要用 bzip2 压缩或解压，一般格式为`xx.tar.bz2`。
     
