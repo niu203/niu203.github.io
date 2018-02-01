@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+    
+    <entry>
+      <title><![CDATA[nginx安装]]></title>
+      <url>/2018/01/31/2018-01-31-nginx/</url>
+      <content type="html"><![CDATA[<h2 id="nginx下载"><a href="#nginx下载" class="headerlink" title="nginx下载"></a>nginx下载</h2><p>下载地址：<a href="http://nginx.org/en/download.html" target="_blank" rel="noopener">http://nginx.org/en/download.html</a></p>
+<h2 id="nginx安装"><a href="#nginx安装" class="headerlink" title="nginx安装"></a>nginx安装</h2><p><strong>安装依赖</strong></p>
+<pre><code>yum -y install make zlib zlib-devel gcc-c++ libtool  openssl openssl-devel  
+</code></pre><p><strong>下载</strong><br>进入安装目录，如<code>/usr/local/</code>，执行以下命令，下载并解压。</p>
+<pre><code># wget http://nginx.org/download/nginx-1.10.3.tar.gz
+# tar zxvf nginx-1.10.3.tar.gz 
+</code></pre><p><strong>进行configure配置</strong></p>
+<pre><code># cd /usr/local/nginx-1.10.3 &amp;&amp; ./configure --prefix=/usr/local/nginx
+</code></pre><p><strong>编译安装</strong></p>
+<pre><code># make &amp;&amp; make install
+</code></pre><p>安装完成后，在当前目录下会有<code>nginx</code>文件夹生成，文件夹下有<code>conf, html, logs, sbin</code>四个目录。<br><strong>nginx简单命令</strong></p>
+<pre><code>./nginx //启动  
+./nginx -s stop //关闭  
+./nginx -s reload //重启
+ps -ef | grep nginx  //查看启动状态  
+</code></pre><p><strong>安装成功</strong><br>    使用浏览器访问，<code>http://localhost</code> 有 Welcome to nginx! 界面即安装成功。</p>
+<h2 id="反向代理配置"><a href="#反向代理配置" class="headerlink" title="反向代理配置"></a>反向代理配置</h2><p>在<code>nginx/conf/nginx.conf</code>配置文件中，修改<code>server</code>块配置，可以添加多个。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">     listen       8000; #监听端口    # listen       127.0.0.1:8000;</span><br><span class="line">     server_name  localhost; </span><br><span class="line">     </span><br><span class="line">     #域名监听，有三种模式。</span><br><span class="line">     #精准匹配（www.domain.com）</span><br><span class="line">     #通配符匹配（*.domain.com 、www.*）</span><br><span class="line">     #正则表达式匹配（~^(?.+)\.domain\.com$）  </span><br><span class="line"></span><br><span class="line">     location / &#123;  #返回根路径地址</span><br><span class="line">         proxy_pass http://127.0.0.1:8080; #设置代理的地址信息</span><br><span class="line">         root   html;</span><br><span class="line">         index  index.html index.htm;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="HTTPS配置"><a href="#HTTPS配置" class="headerlink" title="HTTPS配置"></a>HTTPS配置</h2><h3 id="SSL模块安装"><a href="#SSL模块安装" class="headerlink" title="SSL模块安装"></a>SSL模块安装</h3><p>nginx安装时并没有安装SSL模块，若在配置时添加<code>--with-http_ssl_module</code>参数就可安装，如<strong>没有使用参数</strong>进行以下安装步骤。</p>
+<p>进入到nginx源码目录</p>
+<pre><code># cd /usr/local/nginx-1.10.3
+</code></pre><p>添加SSL配置</p>
+<pre><code># ./configure --prefix=/usr/local/nginx --with-http_ssl_module
+</code></pre><p>编译<strong>不安装</strong>，使用<code>make install</code>命令会进行安装，则会覆盖nginx，导致配置信息重置，因此只编译不安装。</p>
+<pre><code># make
+</code></pre><p>替换nginx可执行程序，则安装完成，重启生效。</p>
+<pre><code># cp objs/nginx /usr/local/nginx/sbin/
+</code></pre><h3 id="生成证书"><a href="#生成证书" class="headerlink" title="生成证书"></a>生成证书</h3><p>谷歌浏览器要求有<code>subjectAltName</code>，火狐浏览器则不能自签（需要CA签）且<code>without basic constraints extension</code> 要求，因此首先修改<code>openssl.cnf</code>文件。</p>
+<p><strong>修改<code>openssl.cnf</code>配置文件</strong></p>
+<pre><code># cd /usr/local/nginx
+# mkdir ssl    //证书文件夹
+# cd ssl
+# cp /etc/pki/tls/openssl.cnf ./     //复制 openssl.cnf 到当前目录，确保文件存在
+</code></pre><p>修改第42行为以下内容</p>
+<pre><code>dir        = ./CA
+</code></pre><p>取消<code>[ req ]</code> 中 <code>req_extensions = v3_req</code>的注释（去掉<code>#</code>符号）</p>
+<p>在<code>[v3_req]</code> 最后一行添加<code>subjectAltName = @alt_names</code>，再添加<code>[alt_names]</code>块，信息如下</p>
+<pre><code>[ v3_req ]
+basicConstraints = CA:FALSE  #此处改为FALSE，否则火狐报错
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+IP.1 = 127.0.0.1 #服务器地址，浏览器请求地址
+IP.2 = 192.168.136.128　＃域名 则使用DNS，如 DNS.1 = demo.com
+</code></pre><p>保存退出。若只使用谷歌浏览器，可直接看<a href="#mytips">附</a></p>
+<p><strong>生成服务端证书</strong></p>
+<pre><code># openssl genrsa -out server.key 2048
+</code></pre><p><strong>生成证书请求CSR文件<code>server.csr</code>，并填写证书信息</strong></p>
+<pre><code># openssl req -new -key server.key -out server.csr -config ./openssl.cnf
+</code></pre><p><strong>生成CA厂商，并对服务端证书签名。</strong></p>
+<p>创建CA目录<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># mkdir ./CA</span></span><br><span class="line"><span class="comment"># mkdir CA/newcerts</span></span><br><span class="line"><span class="comment"># touch CA/index.txt</span></span><br><span class="line"><span class="comment">#echo “01” &gt; CA/serial</span></span><br></pre></td></tr></table></figure></p>
+<p>生存密钥<code>ca.key</code>，自签名生成<code>ca.crt</code>证书，信息为CA厂商，填写独立信息。</p>
+<pre><code># openssl req -new -x509 -days 3650 -keyout ca.key -out ca.crt -config ./openssl.cnf
+</code></pre><p>使用自签署的CA证书签署服务器CSR证书请求，两次回答<code>y</code>。</p>
+<pre><code># openssl ca -policy policy_anything -days 1460 -cert ca.crt -keyfile ca.key -in server.csr -out server.crt -extensions v3_req -config openssl.cnf
+
+policy 参数允许签名的CA和网站证书可以有不同的国家、地名等信息，days参数则是签名时限
+</code></pre><p><span id="mytips"></span></p>
+<blockquote>
+<p>附，只使用谷歌浏览器（允许自签），可使用以下简单命令直接生成证书</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># openssl genrsa -des3 -out server.key 1024</span></span><br><span class="line">//创建私钥 输入口令</span><br><span class="line"><span class="comment"># openssl req -new -key server.key -out server.csr -config ./openssl.cnf -extensions v3_req</span></span><br><span class="line">//创建自签名证书</span><br><span class="line"><span class="comment"># openssl rsa -in server.key -out server.key  </span></span><br><span class="line">//使nginx启动ssl不需要口令</span><br><span class="line"><span class="comment"># openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt  -extfile ./openssl.cnf  -extensions v3_req</span></span><br><span class="line">//生成证书文件</span><br></pre></td></tr></table></figure>
+<h3 id="nginx配置SSL"><a href="#nginx配置SSL" class="headerlink" title="nginx配置SSL"></a>nginx配置SSL</h3><p>配置信息如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    # 修改监听443，开启ssl</span><br><span class="line">    listen       443 ssl;</span><br><span class="line">    server_name  localhost;</span><br><span class="line">    # 指定证书和私钥的位置</span><br><span class="line">    ssl_certificate      /usr/local/nginx/ssl/server.crt;</span><br><span class="line">    ssl_certificate_key  /usr/local/nginx/ssl/server.key;</span><br><span class="line">    ssl_session_timeout  5m;</span><br><span class="line">    ssl_protocols  SSLv2 SSLv3 TLSv1;</span><br><span class="line">    ssl_ciphers  HIGH:!aNULL:!MD5;</span><br><span class="line">    ssl_prefer_server_ciphers   on;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        root   html;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>浏览器访问，如<code>https://192.168.136.128</code>，提示<code>Your connection is not private</code>，浏览器设置选项只导入<code>ca.crt</code>证书，即可使用<code>https</code>访问。</p>
+<p>参考链接</p>
+<p><a href="http://blog.csdn.net/qq_36960656/article/details/78717601?locationNum=5&amp;fps=1" target="_blank" rel="noopener">centos nginx配置https访问</a></p>
+<p><a href="https://stackoverflow.com/questions/6194236/openssl-version-v3-with-subject-alternative-name" target="_blank" rel="noopener">https://stackoverflow.com/questions/6194236/openssl-version-v3-with-subject-alternative-name</a></p>
+<p><a href="https://www.cnblogs.com/lzcys8868/p/6281932.html" target="_blank" rel="noopener">CA认证</a></p>
+<p><a href="https://www.cnblogs.com/liqingjht/p/6267563.html" target="_blank" rel="noopener">支持多域名的 https 证书签名步骤和自签名</a></p>
+<p><a href="https://www.codelast.com/%E5%8E%9F%E5%88%9B-%E4%B8%BAnginx%E6%B7%BB%E5%8A%A0ssl%E6%94%AF%E6%8C%81%E6%A8%A1%E5%9D%97/" target="_blank" rel="noopener">[原创] 为nginx添加SSL支持模块：https://www.codelast.com/</a></p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Centos </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[替换Win10图标方法]]></title>
+      <url>/2018/01/29/2018-01-29Win10icon/</url>
+      <content type="html"><![CDATA[<ul>
+<li>修改文件权限</li>
+<li>准备新的图标文件</li>
+<li>替换</li>
+<li>刷新缓存</li>
+</ul>
+<h2 id="修改imageres-dll权限"><a href="#修改imageres-dll权限" class="headerlink" title="修改imageres.dll权限"></a>修改imageres.dll权限</h2><p>在<code>C:\Windows\System32</code>目录下。找到<code>imageres.dll</code>文件，右键-&gt;属性-&gt;安全，使当前用户具有可写权限。</p>
+<h2 id="准备图标文件"><a href="#准备图标文件" class="headerlink" title="准备图标文件"></a>准备图标文件</h2><p>将新的<code>imageres.dll</code>重命名为<code>imageres2.dll</code>，复制到<code>C:\Windows\System32</code>目录下。</p>
+<h2 id="替换"><a href="#替换" class="headerlink" title="替换"></a>替换</h2><p>打开 <strong>任务管理器</strong>，把<em>explorer.exe</em>(<em>Windows 资源管理器</em>)结束掉。</p>
+<p>文件-&gt;运行新任务-&gt;”cmd”，执行以下命令</p>
+<pre><code>删除
+C:\Windows\system32&gt;del /f imageres.dll
+重命名
+C:\Windows\system32&gt;ren imageres2.dll imageres.dll
+启动 Windows 资源管理器
+C:\Windows\system32&gt;explorer.exe
+</code></pre><h2 id="刷新缓存"><a href="#刷新缓存" class="headerlink" title="刷新缓存"></a>刷新缓存</h2><p><code>Win+R</code>运行 <code>ie4uinit -show</code>，使用<em>任务管理器</em>，将<em>Windows 资源管理器</em>重新启动。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> 教程 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[CentOS常用命令]]></title>
+      <url>/2018/01/26/CentosCommand.html/</url>
+      <content type="html"><![CDATA[<h3 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h3><ol>
+<li>查看ip信息 <code>$ ip addr</code>/<code>ifconfig</code>，</li>
+<li>若网络未连接，则 <code>$ cd /etc/sysconfig/network-scripts/</code>，</li>
+<li>使用<code>ls</code>命令查看，以<code>ifcfg-ens</code>开头的文件，并进行编辑，如<code># vi ifcfg-ens33</code>，</li>
+<li>将’<code>ONBOOT</code>值改为<code>yes</code>，保存退出，即系统启动时自动激活网卡。</li>
+</ol>
+<h3 id="防火墙"><a href="#防火墙" class="headerlink" title="防火墙"></a>防火墙</h3><ul>
+<li><code>firewall-cmd --query-port=6379/tcp</code> 命令，检测端口是否开启，如果返回结果为no，那么证明6379端口没有开启。</li>
+<li><code>firewall-cmd --add-port=6379/tcp</code> 命令，则是将6379端口开启，返回success。（<code>--permanent</code> 参数代表永久生效，没有此参数重启后失效）。</li>
+</ul>
+<h3 id="端口"><a href="#端口" class="headerlink" title="端口"></a>端口</h3><ul>
+<li>查看端口 <code>netstat –apn | grep 8080</code></li>
+</ul>
+<h3 id="tar压缩命令"><a href="#tar压缩命令" class="headerlink" title="tar压缩命令"></a>tar压缩命令</h3><h4 id="主选项"><a href="#主选项" class="headerlink" title="　主选项"></a>　主选项</h4><p>　　<code>c</code> 创建一个新的Tar文件，即压缩文件。<br>　　    $ tar cf filename.tar file1 file2 …<br>　　    $ tar cf filename.tar ./*  </p>
+<p>　　<code>x</code> 从Tar文件中释放文件，即解压文件。<br>　　    $ tar xf filename.tar </p>
+<p>　　<code>t</code> 列出Tar文件的内容。<br>　　    $ tar tf filename.tar</p>
+<blockquote>
+<p>注意: c、x、t 仅能同时使用一个。</p>
+</blockquote>
+<h4 id="辅助选项"><a href="#辅助选项" class="headerlink" title="　辅助选项"></a>　辅助选项</h4><p>　　<code>f</code> filename，后面紧跟文档名，通常必有此参数。</p>
+<p>　　<code>z</code> 是否需要用 gzip 压缩或解压， 一般格式为<code>xx.tar.gz</code>或<code>xx. tgz</code>。<br>        $ tar czf test.tar.gz a b 压缩<br>        $ tar xzf test.tar.gz a b 解压</p>
+<p>　　<code>j</code> 是否需要用 bzip2 压缩或解压，一般格式为<code>xx.tar.bz2</code>。</p>
+<p>　　<code>v</code> 压缩过程中显示文件信息（常用） </p>
+<p>　　<code>--exclude FILE</code>：在压缩的过程中， 排除<code>FILE</code>文件</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="　总结"></a>　总结</h4><p>　　打包 <code>$ tar cvf f.tar f</code></p>
+<p>　　压缩 <code>$ tar czvf f.tgz</code></p>
+<p>　　释放 <code>$ tar xvf f.tar f</code></p>
+<p>　　解压 <code>$ tar xzvf f.tgz</code></p>
+<p>　　查看 <code>$ tar tf f.tar</code></p>
+<h2 id="组件安装"><a href="#组件安装" class="headerlink" title="组件安装"></a>组件安装</h2><h4 id="telent"><a href="#telent" class="headerlink" title="　telent"></a>　telent</h4><blockquote>
+<p>windows系统可在<code>组件</code>中安装</p>
+</blockquote>
+<p>　　检测是否存在</p>
+<pre><code>$ rpm -qa| grep telnet
+</code></pre><p>　　安装</p>
+<pre><code>$ yum -y install telnet
+</code></pre><h4 id="wget"><a href="#wget" class="headerlink" title="　wget"></a>　wget</h4><blockquote>
+<p>wget是一个下载文件的工具，用来从指定的URL下载文件。</p>
+</blockquote>
+<p>　　安装</p>
+<pre><code>$ yum -y install wget
+</code></pre><p>　　使用</p>
+<pre><code>$ wget url
+</code></pre><h4 id="mosh"><a href="#mosh" class="headerlink" title="　mosh"></a>　mosh</h4><blockquote>
+<p><a href="https://mosh.org/" target="_blank" rel="noopener">Mosh</a>是一个移动Shell，可用于SSH连接（远程登陆），具有响应快、支持间歇性连接等优点，使用时需要在服务器端与客户端上分别安装。</p>
+</blockquote>
+<p>　　安装</p>
+<pre><code>$ yum -y install epel-release
+$ yum makecache
+$ yum -y install mosh
+</code></pre><p>　　启动</p>
+<pre><code>$ mosh-server
+</code></pre>]]></content>
+      
+        
+        <tags>
+            
+            <tag> Linux </tag>
+            
+            <tag> 命令 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Android Studio Run 错误]]></title>
+      <url>/2017/12/28/20171228_1.html/</url>
+      <content type="html"><![CDATA[<h3 id="错误："><a href="#错误：" class="headerlink" title="错误："></a>错误：</h3><p>使用 Android Studio 运行一个APK时，提示已经安装是否要卸载重新安装时，点“是”后，有以下错误：</p>
+<blockquote>
+<p>Installation failed with message Failed to finalize session : INSTALL_FAILED_INVALID_APK: /data/app/vmdl1241319322.tmp/11_android<strong>__</strong>-debug version code 20500000 inconsistent with 0.<br>It is possible that this issue is resolved by uninstalling an existing version of the apk if it is present, and then re-installing.</p>
+<p>Unknown failure (at android.os.Binder.execTransact(Binder.java:674))</p>
+</blockquote>
+<h3 id="原因："><a href="#原因：" class="headerlink" title="原因："></a>原因：</h3><p>这是因为 Android Studio 有一个Instant Run 运行机制。报错原因不明。</p>
+<p><a href="https://developer.android.com/studio/run/index.html#instant-run" target="_blank" rel="noopener">官方文档</a>说明</p>
+<blockquote>
+<p>Android Studio 2.0 中引入的 Instant Run 是 Run  和 Debug  命令的行为，可以大幅缩短应用更新的时间。尽管首次构建可能需要花费较长的时间，Instant Run 在向应用推送后续更新时则无需构建新的 APK，因此，这样可以更快地看到更改。</p>
+<p>仅在您部署调试构建变体、使用 Android Plugin for Gradle 版本 2.0.0 或更高版本，以及在应用的模块级别 build.gradle 文件中将 minSdkVersion 设置为 15 或以上时，Instant Run 才受支持。为获得最佳性能，可以将 minSdkVersion 设置为 21 或更高。</p>
+</blockquote>
+<h3 id="解决："><a href="#解决：" class="headerlink" title="解决："></a>解决：</h3><p>停用 Instant Run 机制即可解决问题。</p>
+<ol>
+<li>File -&gt; Settings -&gt; Build, Execution, Deployment.</li>
+<li>Instant Run -&gt; disable “Enable Instant Run to hot swap code/resource changes on deploy”.</li>
+<li>Apply -&gt; OK</li>
+</ol>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Android </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[参考资源]]></title>
+      <url>/2017/12/25/20171225page.html/</url>
+      <content type="html"><![CDATA[<h1 id="教程"><a href="#教程" class="headerlink" title="教程"></a>教程</h1><h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><ul>
+<li>Redis</li>
+<li>Cassandra</li>
+<li>KairosDB</li>
+</ul>
+<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><p><a href="http://www.runoob.com/redis/redis-client-connection.html" target="_blank" rel="noopener">redis-菜鸟教程</a></p>
+<p><a href="http://tool.oschina.net/uploads/apidocs/" target="_blank" rel="noopener">Jedis API</a></p>
+<p><a href="http://blog.csdn.net/szxiaohe/article/details/52934630" target="_blank" rel="noopener">Java操作Redis实现增删改查和基本操作</a></p>
+<h3 id="Cassandra"><a href="#Cassandra" class="headerlink" title="Cassandra"></a>Cassandra</h3><p><a href="https://www.w3cschool.cn/cassandra/cassandra_introduction.html" target="_blank" rel="noopener">Cassandra-W3Cschool</a></p>
+<h3 id="KairosDB"><a href="#KairosDB" class="headerlink" title="KairosDB"></a>KairosDB</h3><p><a href="http://www.donews.com/news/detail/4/2952534.html" target="_blank" rel="noopener">十分钟看懂时序数据库</a></p>
+<p><a href="http://liubin.org/blog/2016/02/18/tsdb-intro/" target="_blank" rel="noopener">时序列数据库武斗大会之什么是TSDB</a></p>
+<h2 id="RESTful"><a href="#RESTful" class="headerlink" title="RESTful"></a>RESTful</h2><ul>
+<li>概述</li>
+<li>实现</li>
+</ul>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><a href="https://blog.igevin.info/posts/restful-architecture-in-general/" target="_blank" rel="noopener">RESTful 架构风格概述</a></p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><h4 id="Jetty服务器"><a href="#Jetty服务器" class="headerlink" title="Jetty服务器"></a>Jetty服务器</h4><p><a href="http://www.eclipse.org/jetty/javadoc/current/overview-summary.html" target="_blank" rel="noopener">Jetty API</a></p>
+<h4 id="Jersey框架"><a href="#Jersey框架" class="headerlink" title="Jersey框架"></a>Jersey框架</h4><p><a href="https://jersey.github.io/documentation/latest/client.html#d0e4207" target="_blank" rel="noopener">Jersey Doc</a></p>
+<h1 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h1><h3 id="IntelliJ-IDEA"><a href="#IntelliJ-IDEA" class="headerlink" title="IntelliJ IDEA"></a>IntelliJ IDEA</h3><p><a href="http://wiki.jikexueyuan.com/project/intellij-idea-tutorial/make-introduce.html" target="_blank" rel="noopener">IntelliJ IDEA极客学院</a></p>
+<p><a href="https://www.jetbrains.com/help/idea/shift.html" target="_blank" rel="noopener">Intellij IDEA 快捷键</a></p>
+<h3 id="浏览器插件"><a href="#浏览器插件" class="headerlink" title="浏览器插件"></a>浏览器插件</h3><p><a href="https://greasyfork.org/zh-CN/" target="_blank" rel="noopener">油猴脚本搜索</a></p>
+<h3 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h3><p><a href="http://mvnrepository.com/" target="_blank" rel="noopener">Maven</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> 学习 </category>
+            
+            <category> 教程 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> Java </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[安卓开发 文档]]></title>
+      <url>/2017/12/22/AppDevelop/</url>
+      <content type="html"><![CDATA[<h3 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h3><blockquote>
+<p><em><a href="https://developer.android.google.cn/guide/components/fundamentals.html" target="_blank" rel="noopener">应用基础知识</a></em></p>
+</blockquote>
+<h4 id="ensp-应用组件"><a href="#ensp-应用组件" class="headerlink" title="&ensp;应用组件"></a>&ensp;应用组件</h4><pre><code>1. Activity
+2. 服务 Service 
+3. 内容提供程序  Broadcast receivers
+4. 广播接收器 Content providers
+</code></pre><h4 id="ensp-启动组件"><a href="#ensp-启动组件" class="headerlink" title="&ensp;启动组件"></a>&ensp;启动组件</h4><p> &emsp;  Intent 的异步消息进行启动</p>
+<h4 id="ensp-清单文件"><a href="#ensp-清单文件" class="headerlink" title="&ensp;清单文件"></a>&ensp;清单文件</h4><p> &emsp;  AndroidManifest.xml </p>
+<h4 id="ensp-应用资源"><a href="#ensp-应用资源" class="headerlink" title="&ensp;应用资源"></a>&ensp;应用资源</h4><h3 id="Hybrid-Mobile-App"><a href="#Hybrid-Mobile-App" class="headerlink" title="Hybrid Mobile App"></a>Hybrid Mobile App</h3><h4 id="ensp-Ionic"><a href="#ensp-Ionic" class="headerlink" title="&ensp;Ionic"></a>&ensp;Ionic</h4><blockquote>
+<p><em><a href="https://ionicframework.com/" target="_blank" rel="noopener">参考文档</a></em></p>
+</blockquote>
+<h4 id="ensp-Angular"><a href="#ensp-Angular" class="headerlink" title="&ensp;Angular"></a>&ensp;Angular</h4><blockquote>
+<p><em><a href="https://angular.io/" target="_blank" rel="noopener">参考文档</a></em></p>
+</blockquote>
+<p> Ionic是基于Angular语法开发的一个框架，UI更美观，使用更快捷等。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 文档 </tag>
+            
+            <tag> 安卓 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[你好，朋友]]></title>
+      <url>/2017/12/22/HelloFriend/</url>
+      <content type="html"><![CDATA[<h2 id="第一篇文章"><a href="#第一篇文章" class="headerlink" title="第一篇文章"></a>第一篇文章</h2><h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"hello,world"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> 你好 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+  
+  
+</search>
